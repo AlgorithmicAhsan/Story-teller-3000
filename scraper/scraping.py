@@ -29,7 +29,7 @@ def getSoup(scraper, url):
 
 def extractText(soup):
     """
-    Cleans the HTML to extract only the Urdu story text.
+    HTML Cleanup & Preprocessing
     """
     contentDiv = soup.find('div', class_='txt_detail') or soup.find('div', class_='detail_txt')
     
