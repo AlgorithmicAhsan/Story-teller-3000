@@ -54,17 +54,39 @@ export default function AIAssistantUI() {
   const [assistantMessage, setAssistantMessage] = useState(null)
   const [isThinking, setIsThinking] = useState(false)
 
-  function handleSend(content) {
+  async function handleSend(content) {
     if (!content.trim()) return
 
     setUserMessage({ content })
-    setAssistantMessage(null)
+    setAssistantMessage({ content: "" })
     setIsThinking(true)
 
-    setTimeout(() => {
+    try {
+      const response = await fetch("http://localhost:8000/generate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ prompt: content }),
+      })
+
+      const reader = response.body.getReader()
+      const decoder = new TextDecoder()
+      let fullText = ""
+
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
+        
+        const chunk = decoder.decode(value)
+        fullText += chunk
+        setAssistantMessage({ content: fullText })
+      }
+    } catch (error) {
+      setAssistantMessage({ content: "Error connecting to server." })
+    } finally {
       setIsThinking(false)
-      setAssistantMessage({ content: "Got it \u2014 I'll help with that." })
-    }, 2000)
+    }
   }
 
   function handlePause() {
