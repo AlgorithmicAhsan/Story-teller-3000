@@ -3,10 +3,21 @@ import random
 from collections import Counter
 from bpe_tokenizer import get_tokenizer
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 from model import TrigramLanguageModel
 
 app = FastAPI()
+
+# Allow frontend to connect
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 class GenerateRequest(BaseModel):
     prompt: str
@@ -28,11 +39,37 @@ model.total_tokens = loaded["total_tokens"]
 l1, l2, l3 = loaded["lambdas"]
 eot_id = loaded["eot_id"]
 
+def generate_stream(prompt: str):
+    """Generator that yields tokens one by one"""
+    prefix_tokens = tokenizer.encode(prompt)
+    tokens = list(prefix_tokens)
+    
+    while len(tokens) < 2:
+        tokens.insert(0, tokens[0] if tokens else 0)
+    
+    # Yield the prefix first
+    yield tokenizer.decode(prefix_tokens)
+    
+    while True:
+        w1, w2 = tokens[-2], tokens[-1]
+        
+        probs = []
+        for token_id in range(model.vocab_size):
+            p = model.interpolated_prob(w1, w2, token_id, l1, l2, l3)
+            probs.append(p)
+        
+        next_token = random.choices(range(model.vocab_size), weights=probs, k=1)[0]
+        tokens.append(next_token)
+        
+        # Yield the new token's text
+        yield tokenizer.decode([next_token])
+        
+        if next_token == eot_id:
+            break
+
 @app.post("/generate")
 def generate_story(request: GenerateRequest):
-
-    prefix_tokens = tokenizer.encode(request.prompt)
-    generated_tokens = model.generate(prefix_tokens, l1, l2, l3, eot_id)    
-    story = tokenizer.decode(generated_tokens)
-
-    return GenerateResponse(story=story)
+    return StreamingResponse(
+        generate_stream(request.prompt),
+        media_type="text/plain"
+    )
