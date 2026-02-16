@@ -1,3 +1,4 @@
+import asyncio
 import json
 import random
 from collections import Counter
@@ -39,7 +40,7 @@ model.total_tokens = loaded["total_tokens"]
 l1, l2, l3 = loaded["lambdas"]
 eot_id = loaded["eot_id"]
 
-def generate_stream(prompt: str):
+async def generate_stream(prompt: str):
     """Generator that yields tokens one by one"""
     prefix_tokens = tokenizer.encode(prompt)
     tokens = list(prefix_tokens)
@@ -49,6 +50,7 @@ def generate_stream(prompt: str):
     
     # Yield the prefix first
     yield tokenizer.decode(prefix_tokens)
+    await asyncio.sleep(0.05)  # Small delay to ensure streaming effect
     
     while True:
         w1, w2 = tokens[-2], tokens[-1]
@@ -63,12 +65,13 @@ def generate_stream(prompt: str):
         
         # Yield the new token's text
         yield tokenizer.decode([next_token])
+        await asyncio.sleep(0.02)  # Delay between tokens
         
         if next_token == eot_id:
             break
 
 @app.post("/generate")
-def generate_story(request: GenerateRequest):
+async def generate_story(request: GenerateRequest):
     return StreamingResponse(
         generate_stream(request.prompt),
         media_type="text/plain"

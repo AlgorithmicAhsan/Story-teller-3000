@@ -62,7 +62,8 @@ export default function AIAssistantUI() {
     setIsThinking(true)
 
     try {
-      const response = await fetch("http://localhost:8000/generate", {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+      const response = await fetch(`${apiUrl}/generate`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -77,7 +78,7 @@ export default function AIAssistantUI() {
       while (true) {
         const { done, value } = await reader.read()
         if (done) break
-        
+
         const chunk = decoder.decode(value)
         fullText += chunk
         setAssistantMessage({ content: fullText })

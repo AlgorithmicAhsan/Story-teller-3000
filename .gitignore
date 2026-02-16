@@ -182,3 +182,11 @@ cython_debug/
 #  refer to https://docs.cursor.com/context/ignore-files
 .cursorignore
 .cursorindexingignore
+# Cleanup - non-essential for deployment
+scraper/
+tokenizer/
+trigram model/
+jsons/
+urdu_stories.json
+urdu_stories_cleaned.json
+/requirements.txt
