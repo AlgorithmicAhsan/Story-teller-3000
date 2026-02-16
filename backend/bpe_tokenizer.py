@@ -7,7 +7,7 @@ SPECIAL_TOKENS = [EOS, EOP, EOT]
 
 
 def load_tokenizer(base_path="."):
-    with open(f"merges.json", "r", encoding="utf-8") as f:
+    with open(f"backend\merges.json", "r", encoding="utf-8") as f:
         merges = {int(k): tuple(v) for k, v in json.load(f).items()}
 
     with open(f"{base_path}/vocab.json", "r", encoding="utf-8") as f:
