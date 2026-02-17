@@ -6,6 +6,20 @@ EOT = "\u0003"
 SPECIAL_TOKENS = [EOS, EOP, EOT]
 
 
+def reconvert_special_tokens(text):
+    """Convert special tokens back to their original characters for display"""
+    # EOP (End of Paragraph) → double newline for paragraph break
+    text = text.replace(EOP, "\n\n")
+    
+    # EOS (End of Sentence) → just remove it (punctuation is already there)
+    text = text.replace(EOS, "")
+    
+    # EOT (End of Text) → remove it
+    text = text.replace(EOT, "")
+    
+    return text
+
+
 def load_tokenizer(base_path="."):
     with open(f"{base_path}/merges.json", "r", encoding="utf-8") as f:
         merges = {int(k): tuple(v) for k, v in json.load(f).items()}
