@@ -93,9 +93,10 @@ async def generate_stream(prompt: str):
 async def generate_story(request: GenerateRequest):
     # Validate that input is Urdu
     if not is_urdu_text(request.prompt):
-        return JSONResponse(
+        return Response(
+            content="براہ کرم اردو میں لکھیں (Please write in Urdu)",
             status_code=400,
-            content={"error": "براہ کرم اردو میں لکھیں (Please write in Urdu)"}
+            media_type="text/plain"
         )
     
     return StreamingResponse(
