@@ -10,16 +10,18 @@ class TrigramLanguageModel:
         self.vocab_size = vocab_size
 
     def unigram_prob(self, w):
-        return (self.unigrams[w] + 1) / (self.total_tokens + self.vocab_size)
+        return self.unigrams[w] / self.total_tokens
 
     def bigram_prob(self, w1, w2):
-        denom = self.unigrams[w1] + self.vocab_size
-        return (self.bigrams[(w1, w2)] + 1) / denom
+        if self.unigrams[w1] == 0:
+            return 0
+        return self.bigrams[(w1, w2)] / self.unigrams[w1]
 
     def trigram_prob(self, w1, w2, w3):
-        denom = self.bigrams[(w1, w2)] + self.vocab_size
-        return (self.trigrams[(w1, w2, w3)] + 1) / denom
-
+        if self.bigrams[(w1, w2)] == 0:
+            return 0
+        return self.trigrams[(w1, w2, w3)] / self.bigrams[(w1, w2)]
+    
     def interpolated_prob(self, w1, w2, w3, l1, l2, l3):
         p1 = self.unigram_prob(w3)
         p2 = self.bigram_prob(w2, w3)

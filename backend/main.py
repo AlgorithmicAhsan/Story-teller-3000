@@ -1,6 +1,7 @@
 import asyncio
 import json
 import random
+import ast
 from collections import Counter
 from bpe_tokenizer import get_tokenizer, reconvert_special_tokens
 from fastapi import FastAPI
@@ -33,8 +34,8 @@ with open("trigram_model.json", "r", encoding="utf-8") as f:
 
 model = TrigramLanguageModel(loaded["vocab_size"])
 model.unigrams = Counter(loaded["unigrams"])
-model.bigrams = Counter({eval(k): v for k, v in loaded["bigrams"].items()})
-model.trigrams = Counter({eval(k): v for k, v in loaded["trigrams"].items()})
+model.bigrams = Counter({ast.literal_eval(k): v for k, v in loaded["bigrams"].items()})
+model.trigrams = Counter({ast.literal_eval(k): v for k, v in loaded["trigrams"].items()})
 model.total_tokens = loaded["total_tokens"]
 
 l1, l2, l3 = loaded["lambdas"]

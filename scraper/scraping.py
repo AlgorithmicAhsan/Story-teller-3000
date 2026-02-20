@@ -4,7 +4,7 @@ import time
 import json
 import random
 
-targetCount = 200
+targetCount = 500
 outputFile = "urdu_stories.json"
 baseUrl = "https://www.urdupoint.com/kids/section/stories.html"
 pageUrlTemplate = "https://www.urdupoint.com/kids/section/stories-page{}.html"
