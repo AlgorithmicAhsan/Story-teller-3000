@@ -6,7 +6,7 @@ from collections import Counter
 from bpe_tokenizer import get_tokenizer, reconvert_special_tokens
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse, JSONResponse
+from fastapi.responses import StreamingResponse, Response
 from pydantic import BaseModel
 from model import TrigramLanguageModel
 
