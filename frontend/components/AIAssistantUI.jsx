@@ -71,6 +71,14 @@ export default function AIAssistantUI() {
         body: JSON.stringify({ prompt: content }),
       })
 
+      // Handle validation errors (now returns plain text)
+      if (!response.ok) {
+        const errorText = await response.text()
+        setAssistantMessage({ content: errorText || "Error connecting to server." })
+        setIsThinking(false)
+        return
+      }
+      
       const reader = response.body.getReader()
       const decoder = new TextDecoder()
       let fullText = ""
